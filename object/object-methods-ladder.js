@@ -23,6 +23,7 @@ var ladder = {
   },
   showStep: function() { // вывести текущую ступеньку
     alert( this.step );
+	return this;
   }
 };
 
