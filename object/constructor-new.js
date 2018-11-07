@@ -10,17 +10,6 @@
 
 */
 
-function sum(a){
-return function (b){
-
-return a+b;
-
-}
-}
-
-sum(1)(2);
-
-
 function Calculator(){
   this.read = function(){
     this.val1 = +prompt('укажите число',0);
