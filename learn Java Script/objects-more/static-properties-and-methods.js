@@ -13,7 +13,7 @@
 function Article() {
   this.created = new Date();
   Article.count++;
-Article.date = this.created.getDate()+"."+this.created.getMonth()+"."+this.created.getFullYear();
+Article.date = this.created.getDate()+"."+(this.created.getMonth()+1)+"."+this.created.getFullYear();
 
 }
 Article.count = 0;
