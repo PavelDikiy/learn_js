@@ -4,7 +4,6 @@
 
 function count(func){
   var countNum = 0;
-  var joinFunction;
 
   function sherbele(){
   countNum++;
