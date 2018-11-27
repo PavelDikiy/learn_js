@@ -77,7 +77,7 @@ function makeCaching(f) {
 
   function memory(a) {
 
-    if (varibl == a) {
+    if (varibl === a) {
       return resul;
     }
 
