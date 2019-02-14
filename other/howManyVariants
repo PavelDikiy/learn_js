@@ -1,0 +1,87 @@
+//------------------------------
+var A = [5,10, 15, 20];
+var B = howManyVariants(A);
+
+//------- Var 1
+function howManyVariants(A){
+var arr = [];
+
+for (var i = 0; i < A.length; i++){
+	arr.push(
+			(function(i){
+				return function(){return A[i];}
+			})(i)
+		);
+}
+return arr;
+}
+
+//------- Var 2
+
+function howManyVariants(A){
+var arr = [];
+
+	for (var i = 0; i < A.length; i++){
+		(function(i){
+			arr.push(
+				function(){
+				return A[i];
+				}
+			);
+		})(i);
+	}
+	return arr;
+}
+
+//------- Var 2
+
+function howManyVariants(A){
+var arr = [];
+
+	for (var i = 0; i < A.length; i++){
+
+		arr.push(
+			function(){return A[i];}.bind(null,i)
+			);
+
+	}
+	return arr;
+}
+
+//------- Var 3
+function howManyVariants(A){
+	var arr = [];
+
+	for (var i = 0; i < A.length; i++){
+		arr.push(
+			function(i){return A[i];}.bind(null,i)
+			);
+
+	}
+	return arr;
+}
+
+//------- Var 4
+
+function howManyVariants(A){
+	var arr = [];
+
+	A.forEach(function(val){
+		arr.push(function(){return val;});
+	});
+	return arr;
+}
+
+//------- Var 5
+
+function howManyVariants(A){
+	return A.map(function(val){
+			return function(){return val;}
+	});
+}
+
+
+
+for(var i = 0; i < A.length; i++){
+console.log(A[i] == B[i]()); // ------------>  true
+}
