@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>TZ</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+
+        }
+
+        #container.complete {
+            animation-name: shadow;
+            animation-duration: 1s;
+            animation-iteration-count: 1;
+            box-shadow: inset 0 0 0 0.1rem green;
+        }
+
+        @keyframes shadow {
+            from {
+                box-shadow: inset 0 0 10rem 0.3rem #00cf00;
+            }
+            to {
+                box-shadow: inset 0 0 0 0.1rem green;
+            }
+        }
+
+        .loader {
+            position: absolute;
+            font-weight: bold;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            transition: color 1s;
+        }
+
+        .loader.loadDone {
+            color: transparent;
+        }
+
+        .loader:after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background-color: #ccc;
+            opacity: .1;
+            box-shadow: 0px 0px 10px 0px #000;
+        }
+
+        img {
+            max-width: 100px;
+            max-height: 100px;
+            display: block;
+            position: absolute;
+            opacity: 0;
+            transition: all 1s;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <div class="loader">00</div>
+</div>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<!-- Your custom script here -->
+<script type="text/babel">
+  'use strict';
+  function goDraw() {
+    const rad = 150;
+    const renderArr = [];
+    const conatainer = document.getElementById('container');
+    const loader = document.getElementsByClassName('loader');
+    const objEvent = {epx: 0, epy: 0};
+    const RenderObj = class {
+      constructor(id, imgurl, width, toppoz, leftpoz, show) {
+        this.id = id,
+          this.imgurl = imgurl,
+          this.width = width,
+          this.toppoz = toppoz,
+          this.leftpoz = leftpoz,
+          this.show = show
+      }
+    };
+    let load = 0;
+    let isComplate = false;
+
+    function loadImg(maxPhoto) {
+      let count = 0;
+      let countForDubl = 1;
+      for (let i = 0; i < maxPhoto; i++) {
+
+
+        setTimeout(() => {
+          let img = new Image();
+
+          img.onload = () => {
+            ++countForDubl;
+            let tpoz, lpoz, randW;
+
+            randW = Math.ceil(50 + Math.random() * (100 - 50));
+
+            tpoz = Math.ceil(Math.random() * window.innerHeight);
+            if (tpoz + 100 > window.innerHeight) tpoz = window.innerHeight - 100;
+            lpoz = Math.ceil(Math.random() * window.innerWidth);
+            if (lpoz + 100 > window.innerWidth) lpoz = window.innerWidth - 100;
+
+            load = Math.ceil((count * 100) / maxPhoto);
+            loader[0].innerHTML = (load < 10) ? "0" + load : load;
+
+            renderArr.push(
+              new RenderObj(++count, `./img/photo${countForDubl}.jpg`, randW, tpoz, lpoz, false)
+            );
+
+            if (countForDubl === 20) {
+              console.log(countForDubl);
+              countForDubl = 1;
+            }
+
+            if (load === 100) {
+              loader[0].classList.add('loadDone');
+              renderImg(renderArr);
+              return;
+            }
+          };
+
+          img.src = `./img/photo${countForDubl}.jpg`;
+        }, 10 * (i+1));
+
+
+      }
+    }
+
+    function renderImg(newArr) {
+      for (let i = 0; i < newArr.length; i++) {
+        conatainer.insertAdjacentHTML('beforeend',
+          `<img src="${newArr[i].imgurl}" numb="${i + 1}" width="${newArr[i].width}" style=" top: ${newArr[i].toppoz}px; left: ${newArr[i].leftpoz}px; " />`);
+      }
+    }
+
+    function filterNoActive(item) {
+      if (item.show === false &&
+        ((item.leftpoz < objEvent.epx + rad && item.leftpoz > objEvent.epx - rad)
+        && (item.toppoz < objEvent.epy + rad && item.toppoz > objEvent.epy - rad) )) {
+        item.show = true;
+        return true;
+      }
+    }
+
+    function allActive(item) {
+      return item.show === false;
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      objEvent.epx = e.pageX;
+      objEvent.epy = e.pageY || 0;
+      loader[0].style.left = objEvent.epx - (loader[0].clientWidth / 2) + "px";
+      loader[0].style.top = objEvent.epy - 20 + "px";
+      if (load === 100) {
+
+        let filt = renderArr.filter(filterNoActive);
+        let doneDraw = renderArr.filter(allActive);
+
+        if (filt.length > 0) {
+          for (let i = 0; i < filt.length; i++) {
+            document.querySelector(`img[numb="${filt[i].id}"]`).style.opacity = 1;
+          }
+        }
+
+        if (doneDraw.length === 0 && !isComplate) {
+          const arrPoz = ["-1000", "1000"];
+          const rundomPoz = function () {
+            return arrPoz[Math.round(Math.random())];
+          };
+
+
+          conatainer.classList.add('complete');
+
+          for (let i = 0; i < renderArr.length; i++) {
+            setTimeout(() => {
+              let el = document.querySelector(`img[numb="${renderArr[i].id}"]`);
+              el.style.opacity = 0;
+              el.style.transform = `translate(${rundomPoz()}%,${rundomPoz()}%)`;
+              if (i === renderArr.length - 1) {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1000);
+              }
+            }, 12 * (i + 1));
+          }
+          isComplate = true;
+        }
+      }
+
+    });
+
+    loadImg(150);
+  };
+
+  window.onload = () => {
+    goDraw();
+  }
+</script>
+</body>
+</html>
